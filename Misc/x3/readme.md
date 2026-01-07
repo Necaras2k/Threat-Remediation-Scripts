@@ -46,3 +46,24 @@ This provides a clean, file-centric workspace without modifying or navigating th
 gcc x3.c -o x3
 sudo mv x3 /usr/local/bin/
 ```
+
+### Multiple keyword AND search (default)
+
+```
+/
+/ bin
+// bin dll → finds files matching both "bin" and "dll" (in path or filename)
+OR search
+// bin | dll → finds files matching "bin" OR "dll"
+// *.exe | *.dll → all executables OR DLLs
+NOT/exclusion search
+// *.dll !test → DLL files excluding those with "test" in name/path
+// config !backup → config files, excluding backup directories
+Path vs filename targeting
+// path:bin name:*.dll → DLL files in directories with "bin" in path
+// name:config path:etc → files named "config" in "etc" directories
+// ext:dll dir:bin → DLL extension in "bin" directories
+Multiple patterns
+// *.dll *.exe *.bat → files matching any of these patterns (OR logic)
+// config.* settings.* → files starting with "config" or "settings"
+```
