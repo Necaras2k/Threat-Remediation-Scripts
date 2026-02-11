@@ -1,6 +1,15 @@
-$process = Get-Process CrystalPDF -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
+$procList = @("CrystalPDF")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop CrystalPDF process => $process"
+        } else {
+            Write-Host "Stopped CrystalPDF process => $process"
+        }
+        Start-Sleep -Seconds 2
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -17,9 +26,9 @@ foreach ($user in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "Failed to remove CrystalPDF => $path"
+                    Write-Host "Failed to remove CrystalPDF user path => $path"
                 } else {
-                    Write-Host "Removed CrystalPDF => $path"
+                    Write-Host "Removed CrystalPDF user path => $path"
                 }
             }
         }
@@ -34,9 +43,9 @@ foreach ($reg in $regHKLM) {
     if (Test-Path -Path $reg) {
         Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
-            Write-Host "Failed to remove CrystalPDF => $reg"
+            Write-Host "Failed to remove CrystalPDF HKLM key => $reg"
         } else {
-            Write-Host "Removed CrystalPDF => $reg"
+            Write-Host "Removed CrystalPDF HKLM key => $reg"
         }
     }
 }
@@ -54,9 +63,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove CrystalPDF => $regPath"
+                    Write-Host "Failed to remove CrystalPDF HKU key => $regPath"
                 } else {
-                    Write-Host "Removed CrystalPDF => $regPath"
+                    Write-Host "Removed CrystalPDF HKU key => $regPath"
                 }
             }
         }
