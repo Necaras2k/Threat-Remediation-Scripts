@@ -14,7 +14,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    "Easy2Convert Removal Unsuccessful => $path"
+                    Write-Host "Failed to remove Easy2Convert => $path"
+                } else {
+                    Write-Host "Removed Easy2Convert => $path"
                 }
             }
         }
@@ -24,7 +26,9 @@ foreach ($username in $user_list) {
             if (Test-Path $install) {
                 Remove-Item $install -Force -ErrorAction SilentlyContinue
                 if (Test-Path $install) {
-                    "Easy2Convert Installer Removal Unsuccessful => $install"
+                    Write-Host "Failed to remove Easy2Convert installer => $install"
+                } else {
+                    Write-Host "Removed Easy2Convert installer => $install"
                 }
             }
         }
@@ -44,7 +48,9 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path $taskPath) {
-            "Failed to remove Easy2Convert Task => $taskPath"
+            Write-Host "Failed to remove Easy2Convert task => $taskPath"
+        } esle {
+            Write-Host "Removed Easy2Convert task => $taskPath"
         }
     }
 }
@@ -59,7 +65,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path $regPath) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path $regPath) {
-                    "Easy2Convert HKU Registry Removal Unsuccessful => $regPath"
+                    Write-Host "Failed to remove Easy2Convert HKU Registry => $regPath"
+                } esle {
+                    Write-Host "Removed Easy2Convert HKU Registry => $regPath"
                 }
             }
         }
