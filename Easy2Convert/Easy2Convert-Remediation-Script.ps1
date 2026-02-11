@@ -1,6 +1,15 @@
-$process = Get-Process "Easy2Convert" -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue    
+$procList = @("Easy2Convert")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop Easy2Convert process => $process"
+        } else {
+            Write-Host "Stopped Easy2Convert process => $process"
+        }
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -14,9 +23,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "Failed to remove Easy2Convert => $path"
+                    Write-Host "Failed to remove Easy2Convert user path => $path"
                 } else {
-                    Write-Host "Removed Easy2Convert => $path"
+                    Write-Host "Removed Easy2Convert user path => $path"
                 }
             }
         }
