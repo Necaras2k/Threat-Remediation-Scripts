@@ -63,9 +63,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path $reg) {
                 Remove-Item $reg -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $reg) {
-                    Write-Host "Failed to remove ConvertMate user key => $reg"
+                    Write-Host "Failed to remove ConvertMate HKU key => $reg"
                 } else {
-                    Wrrite-Host "Removed ConvertMate user key => $reg"
+                    Wrrite-Host "Removed ConvertMate HKU key => $reg"
                 }
             }
         }
