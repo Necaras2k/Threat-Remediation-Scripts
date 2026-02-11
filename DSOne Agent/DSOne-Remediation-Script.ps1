@@ -4,6 +4,11 @@ foreach ($proc in $procList) {
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
         Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop DSOne Agent process => $process"
+        } else {
+            Write-Host "Stopped DSOne Agent process => $process"
+        }
     }
 }
 Start-Sleep -Seconds 2
@@ -18,9 +23,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $target) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
-                    Write-Host "Failed to remove DSOne Agent => $target"
+                    Write-Host "Failed to remove DSOne Agent installer => $target"
                 } else {
-                    Write-Host "Removed DSOne Agent => $target"
+                    Write-Host "Removed DSOne Agent installer => $target"
                 }
             }
         }
@@ -34,9 +39,9 @@ foreach ($path in $paths) {
     if (Test-Path -Path $path) {
         Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $path) {
-            Write-Host "Failed to remove DSOne Agent => $path"
+            Write-Host "Failed to remove DSOne Agent system path => $path"
         } else {
-            Write-Host "Removed DSOne Agent => $path"
+            Write-Host "Removed DSOne Agent system path => $path"
         }
     }
 }
@@ -54,9 +59,9 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            Write-Host "Failed to remove DSOne Agent task entry => $taskPath"
+            Write-Host "Failed to remove DSOne Agent task => $taskPath"
         } else {
-            Write-Host "Removed DSOne Agent task entry => $taskPath"
+            Write-Host "Removed DSOne Agent task => $taskPath"
         }
     }
 }
