@@ -1,17 +1,15 @@
-$process = Get-Process PCAppStore -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
-}
-$process = Get-Process NW_store -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
-}
-$process = Get-Process Watchdog -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
+$procList = @("PCAppStore", "NW_store", "Watchdog")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop PC App Store process => $process"
+        } else {
+            Write-Host "Stopped PC App Store process => $process"
+        }
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -27,7 +25,9 @@ foreach ($user in $user_list) {
             if (Test-Path $path) {
                 Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path $path) {
-                    Write-Host "[!] Failed to remove PCAppstore -> $path"
+                    Write-Host "Failed to remove PC App Store user path => $path"
+                } else {
+                    Write-Host "Removed PC App Store user path => $path"
                 }
             }
         }
@@ -35,8 +35,9 @@ foreach ($user in $user_list) {
         if (Test-Path $path) {
             Remove-Item $path -ErrorAction SilentlyContinue
             if (Test-Path $path) {
-                $file = Get-ChildItem $path -ErrorAction SilentlyContinue
-                Write-Host "[!] Failed to remove PCAppStore installer => $file"
+                Write-Host "Failed to remove PC App Store installer => $path"
+            } else {
+                Write-Host "Removed PC App Store installer => $path"
             }
         }
     }
@@ -55,7 +56,9 @@ foreach ($sid in $sid_list) {
             if (Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if (Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue) {
-                    Write-Host "[!] Failed to remove PCAppStore => Registry::HKU\$sid\Software\Microsoft\Windows\CurrentVersion\Run.$key"
+                    Write-Host "Failed to remove PC App Store HKU key => $keypath.$key"
+                } else {
+                    Write-Host "Removed PC App Store HKU key => $keypath.$key"
                 }
             }
         }
@@ -63,22 +66,38 @@ foreach ($sid in $sid_list) {
         if (Test-Path $path) {
             Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
             if (Test-Path $path) {
-                Write-Host "[!] Failed to remove PCAppStore registry key => $path"
+                Write-Host "Failed to remove PC App Store HKU key => $path"
+            } else {
+                Write-Host "Removed PC App Store HKU key => $path"
             }
         }
     }
 }
 
-if (Test-Path "C:\windows\system32\tasks\PCAppStoreAutoUpdater") {
-    Remove-Item "C:\windows\system32\tasks\PCAppStoreAutoUpdater" -ErrorAction SilentlyContinue
-    if (Test-Path "C:\windows\system32\tasks\PCAppStoreAutoUpdater") {
-        Write-Host "[!] Failed to remove PCAppstore => C:\windows\system32\tasks\PCAppStoreAutoUpdater"
+$tasks = @(
+    "C:\windows\system32\tasks\PCAppStoreAutoUpdater"
+)
+foreach ($task in $tasks) {
+    if (Test-Path -Path $task) {
+        Remove-Item $task -Force -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $task) {
+            Write-Host "Failed to remove PC App Store task => $task"
+        } else {
+            Write-Host "Removed PC App Store task => $task"
+        }
     }
 }
 
-if (Test-Path "Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\PCAppStoreAutoUpdater") {
-    Remove-Item "Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\PCAppStoreAutoUpdater" -Recurse -ErrorAction SilentlyContinue
-    if (Test-Path "Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\PCAppStoreAutoUpdater") {
-        Write-Host "[!] Failed to remove PCAppstore => Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\PCAppStoreAutoUpdater"
+$taskCacheKeys = @(
+    "Registry::HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\PCAppStoreAutoUpdater"
+)
+foreach ($taskCacheKey in $taskCacheKeys) {
+    if (Test-Path -Path $taskCacheKey) {
+        Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $taskCacheKey) {
+            Write-Host "Failed to PC App Store HKLM key => $taskCacheKey"
+        } else {
+            Write-Host "Removed PC App Store HKLM key => $taskCacheKey"
+        }
     }
 }
