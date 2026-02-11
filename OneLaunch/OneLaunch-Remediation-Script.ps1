@@ -1,17 +1,10 @@
-$process = Get-Process onelaunch -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
-}
-$process = Get-Process onelaunchtray -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
-}
-$process = Get-Process chromium -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2 
+$procList = @("onelaunch", "onelaunchtray", "chromium")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -22,7 +15,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
-                Write-Host "Failed to remove: $install"
+                Write-Host "Failed to remove OneLaunch installer => $install"
+            } else {
+                Write-Host "Removed OneLaunch installer => $install"
             }
         }
     }
@@ -36,7 +31,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $shortcut) {
             Remove-Item $shortcut -ErrorAction SilentlyContinue
             if (Test-Path -Path $shortcut) {
-                Write-Host "Failed to remove OneLaunch -> $shortcut"
+                Write-Host "Failed to remove OneLaunch shortcut => $shortcut"
+            } else {
+                Write-Host "Removed OneLaunch shortcut => $shortcut"
             }
         }
     }
@@ -48,7 +45,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $localPath) {
             Remove-Item $localPath -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $localPath) {
-                Write-Host "Failed to remove OneLaunch -> $localPath"
+                Write-Host "Failed to remove OneLaunch => $localPath"
+            } else {
+                Write-Host "Removed OneLaunch => $localPath"
             }
         }
     }
@@ -61,7 +60,9 @@ foreach ($sid in $sid_list) {
         if (Test-Path $uninstallKey) {
             Remove-Item $uninstallKey -Recurse -ErrorAction SilentlyContinue
             if (Test-Path $uninstallKey) {
-                Write-Host "Failed to remove OneLaunch -> $uninstallKey"
+                Write-Host "Failed to remove OneLaunch => $uninstallKey"
+            } else {
+                Write-Host "Removed OneLaunch => $uninstallKey"
             }
         }
         $runKeys = @(
@@ -75,6 +76,8 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue)) {
                     Write-Host "Failed to remove OneLaunch => $keypath.$key"
+                } else {
+                    Write-Host "Removed OneLaunch => $keypath.$key"
                 }
             }
         }
@@ -89,6 +92,8 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue)) {
                     Write-Host "Failed to remove OneLaunch => $keypath.$key"
+                } else {
+                    Write-Host "Removed OneLaunch => $keypath.$key"
                 }
             }
         }
@@ -98,6 +103,8 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue)) {
                     Write-Host "Failed to remove OneLaunch => $keypath.$key"
+                } else {
+                    Write-Host "Removed OneLaunch => $keypath.$key"
                 }
             }
         }
@@ -107,6 +114,8 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue)) {
                     Write-Host "Failed to remove OneLaunch => $keypath.$key"
+                } else {
+                    Write-Host "Removed OneLaunch => $keypath.$key"
                 }
             }
         }
@@ -119,6 +128,8 @@ foreach ($sid in $sid_list) {
                 Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove OneLaunch => $path"
+                } else {
+                    Write-Host "Removed OneLaunch => $path"
                 }
             }
         }
@@ -135,8 +146,9 @@ foreach ($task in $tasks) {
     if (Test-Path $taskPath) {
         Remove-Item $taskPath -ErrorAction SilentlyContinue
         if (Test-Path $taskPath) {
-            Write-Host "Failed to remove OneLaunch -> $taskPath"
-        }
+            Write-Host "Failed to remove OneLaunch => $taskPath"
+        } else {
+            Write-Host "Removed OneLaunch => $taskPath"
     }
 }
 
