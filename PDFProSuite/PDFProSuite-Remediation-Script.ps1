@@ -1,6 +1,15 @@
-$process = Get-Process pdfprosuite -ErrorAction SilentlyContinue
-if ($process) { 
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
+$procList = @("pdfprosuite")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop PDF Pro Suite process => $process"
+        } else {
+            Write-Host "Stopped PDF Pro Suite process => $process"
+        }
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -12,7 +21,9 @@ foreach ($user in $user_list) {
             if (Test-Path $installer) {
                 Remove-Item $installer -Force -ErrorAction SilentlyContinue
                 if (Test-Path $installer) {
-                    "Failed to remove PDFProSuite installer => $installer"
+                    Write-Host "Failed to remove PDF Pro Suite installer => $installer"
+                } else {
+                    Write-Host "Removed PDF Pro Suite installer => $installer"
                 }
             }
         }
@@ -22,12 +33,13 @@ foreach ($user in $user_list) {
             "C:\Users\$user\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PDFProSuite\pdf pro suite.lnk",
             "C:\Users\$user\Desktop\pdf pro suite.lnk"
         )
-
         foreach ($shortcut in $shortcuts) {
             if (Test-Path $shortcut) {
                 Remove-Item $shortcut -ErrorAction SilentlyContinue
                 if (Test-Path $shortcut) {
-                    "Failed to remove PDFProSuite -> $shortcut"
+                    Write-Host "Failed to remove PDF Pro Suite shortcut => $shortcut"
+                } else {
+                    Write-Host "Removed PDF Pro Suite shortcut => $shortcut"
                 }
             }
         }
@@ -37,12 +49,13 @@ foreach ($user in $user_list) {
             "C:\Users\$user\AppData\Local\PDFProSuite",
             "C:\Users\$user\AppData\Local\BrowserHelper"
         )
-
         foreach ($localPath in $localPaths) {
             if (Test-Path $localPath) {
                 Remove-Item $localPath -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $localPath) {
-                    "Failed to remove PDFProSuite -> $localPath"
+                    Write-Host "Failed to remove PDF Pro Suite user path => $localPath"
+                } else {
+                    Write-Host "Removed PDF Pro Suite user path => $localPath"
                 }
             }
         }
@@ -56,29 +69,29 @@ $sid_list = Get-Item -Path "Registry::HKU\S-*" |
 
 foreach ($sid in $sid_list) {
     if ($sid -notlike "*_Classes*") {
-
-        # Run Key
         $runKeys = @("PDFProSuite")
         $runPath = "Registry::$sid\Software\Microsoft\Windows\CurrentVersion\Run"
-
         foreach ($key in $runKeys) {
             if (Get-ItemProperty -Path $runPath -Name $key -ErrorAction SilentlyContinue) {
                 Remove-ItemProperty -Path $runPath -Name $key -ErrorAction SilentlyContinue
                 if (Get-ItemProperty -Path $runPath -Name $key -ErrorAction SilentlyContinue) {
-                    "Failed to remove PDFProSuite => $runPath.$key"
+                    Write-Host "Failed to remove PDF Pro Suite HKU key => $runPath.$key"
+                } else {
+                    Write-Host "Removed PDF Pro Suite HKU key => $runPath.$key"
                 }
             }
         }
-
+        
         $regPaths = @(
             "Registry::$sid\Software\PDF Pro Suite"
         )
-
         foreach ($path in $regPaths) {
             if (Test-Path $path) {
                 Remove-Item $path -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $path) {
-                    "Failed to remove PDFProSuite => $path"
+                    Write-Host "Failed to remove PDF Pro Suite HKU key => $path"
+                } else {
+                    Write-Host "Removed PDF Pro Suite HKU key => $path"
                 }
             }
         }
