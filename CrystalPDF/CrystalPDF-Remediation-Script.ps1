@@ -17,7 +17,9 @@ foreach ($user in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    "Failed to remove CrystalPDF -> $path"
+                    Write-Host "Failed to remove CrystalPDF -> $path"
+                } else {
+                    Write-Host "Removed CrystalPDF -> $path"
                 }
             }
         }
@@ -32,7 +34,9 @@ foreach ($reg in $regHKLM) {
     if (Test-Path -Path $reg) {
         Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
-            "Failed to remove CrystalPDF -> $reg"
+            Write-Host "Failed to remove CrystalPDF -> $reg"
+        } else {
+            Write-Host "Removed CrystalPDF -> $reg"
         }
     }
 }
@@ -50,7 +54,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    "Failed to remove CrystalPDF -> $regPath"
+                    Write-Host "Failed to remove CrystalPDF -> $regPath"
+                } else {
+                    Write-Host "Removed CrystalPDF -> $regPath"
                 }
             }
         }
