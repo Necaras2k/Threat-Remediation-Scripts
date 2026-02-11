@@ -3,6 +3,11 @@ foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop ConvertMate process => $process"
+        } else {
+            Write-Host "Stopped ConvertMate process => $process"
+        }
         Start-Sleep -Seconds 2
     }
 }
@@ -19,9 +24,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $target) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
-                    Write-Host "Failed to remove ConvertMate => $target"
+                    Write-Host "Failed to remove ConvertMate user path => $target"
                 } else {
-                    Write-Host "Removed ConvertMate => $target"
+                    Write-Host "Removed ConvertMate user path => $target"
                 }
             }
         }
@@ -41,9 +46,9 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            Write-Host "Failed to remove ConvertMate task entry => $taskPath"
+            Write-Host "Failed to remove ConvertMate task => $taskPath"
         } else {
-            Write-Host "Removed ConvertMate task entry => $taskPath"
+            Write-Host "Removed ConvertMate task => $taskPath"
         }
     }
 }
@@ -76,9 +81,9 @@ foreach ($regPath in $regHKLM) {
     if (Test-Path $regPath) {
         Remove-Item $regPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path $regPath) {
-            Write-Host "Failed to remove ConvertMate registry key => $regPath"
+            Write-Host "Failed to remove ConvertMate HKLM key => $regPath"
         } else {
-            Write-Host "Removed ConvertMate registry key => $regPath"
+            Write-Host "Removed ConvertMate HKLM key => $regPath"
         }
     }
 }
