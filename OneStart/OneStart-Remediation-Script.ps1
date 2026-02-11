@@ -3,11 +3,11 @@ foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop OneStart process => $process"
         } else {
             Write-Host "Stopped OneStart process => $process"
-        Start-Sleep -Seconds 2
     }
 }
 Start-Sleep -Seconds 2
@@ -105,9 +105,9 @@ foreach ($taskCacheKey in $taskCacheKeys) {
     if (Test-Path -Path $taskCacheKey) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
-            Write-Host "Failed to remove OneStart task key => $taskCacheKey"
+            Write-Host "Failed to remove OneStart HKLM key => $taskCacheKey"
         } else {
-            Write-Host "Removed OneStart task key => $taskCacheKey"
+            Write-Host "Removed OneStart HKLM key => $taskCacheKey"
         }
     }
 }
@@ -161,9 +161,9 @@ foreach ($sid in $sid_list) {
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                    Write-Host "Failed to remove OneStart run key => $keypath.$runKey"
+                    Write-Host "Failed to remove OneStart HKU key => $keypath.$runKey"
                 } else {
-                    Write-Host "Removed OneStart run key => $keypath.$runKey"
+                    Write-Host "Removed OneStart HKU key => $keypath.$runKey"
                 }
             }
         }
@@ -173,9 +173,9 @@ foreach ($sid in $sid_list) {
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                    Write-Host "Failed to remove OneStart run key => $keypath.$runKey"
+                    Write-Host "Failed to remove OneStart HKU key => $keypath.$runKey"
                 } else {
-                    Write-Host "Removed OneStart run key => $keypath.$runKey"
+                    Write-Host "Removed OneStart HKU key => $keypath.$runKey"
                 }
             }
         }
