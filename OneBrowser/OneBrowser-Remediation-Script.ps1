@@ -1,10 +1,10 @@
-$process = Get-Process OneBrowser -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-}
-$process = Get-Process OBUpdateService -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
+$procList = @("OneBrowser", "OBUpdateService")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -15,7 +15,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
-                Write-Host "Failed to remove OneBrowser installer -> $install"
+                Write-Host "Failed to remove OneBrowser installer => $install"
+            } else {
+                Write-Host "Removed OneBrowser installer => $install"
             }
         }
     }
@@ -25,7 +27,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
-                Write-Host "Failed to remove OneBrowser installer -> $install"
+                Write-Host "Failed to remove OneBrowser installer => $install"
+            } else {
+                Write-Host "Removed OneBrowser installer => $install"
             }
         }
     }
@@ -38,7 +42,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $path) {
             Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $path) {
-                Write-Host "Failed to remove OneBrowser -> $path"
+                Write-Host "Failed to remove OneBrowser => $path"
+            } else {
+                Write-Host "Removed OneBrowser => $path"
             }
         }
     }
@@ -52,7 +58,9 @@ foreach ($task in $tasks) {
     if (Test-Path -Path $task) {
         Remove-Item $task -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $task) {
-            Write-Host "Failed to remove OneBrowser task -> $task"
+            Write-Host "Failed to remove OneBrowser task => $task"
+        } else {
+            Write-Host "Removed OneBrowser task => $task"
         }
     }
 }
@@ -64,7 +72,9 @@ foreach ($taskCacheKey in $taskCacheKeys) {
     if (Test-Path -Path $taskCacheKey) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
-            Write-Host "Failed to remove OneBrowser -> $taskCacheKey"
+            Write-Host "Failed to remove OneBrowser => $taskCacheKey"
+        } else {
+            Write-Host "Removed OneBrowser => $taskCacheKey"
         }
     }
 }
@@ -80,7 +90,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove OneBrowser -> $regPath"
+                    Write-Host "Failed to remove OneBrowser => $regPath"
+                } else {
+                    Write-Host "Removed OneBrowser => $regPath"
                 }
             }
         }
