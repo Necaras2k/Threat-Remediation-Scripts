@@ -4,6 +4,11 @@ foreach ($proc in $procList) {
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
         Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop OneBrowser proccess => $process"
+        } else {
+            Write-Host "Stopped OneBrowse process => $process"
+        }
     }
 }
 Start-Sleep -Seconds 2
@@ -42,9 +47,9 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $path) {
             Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $path) {
-                Write-Host "Failed to remove OneBrowser => $path"
+                Write-Host "Failed to remove OneBrowser user path => $path"
             } else {
-                Write-Host "Removed OneBrowser => $path"
+                Write-Host "Removed OneBrowser user path => $path"
             }
         }
     }
@@ -72,9 +77,9 @@ foreach ($taskCacheKey in $taskCacheKeys) {
     if (Test-Path -Path $taskCacheKey) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
-            Write-Host "Failed to remove OneBrowser => $taskCacheKey"
+            Write-Host "Failed to remove OneBrowser HKLM key => $taskCacheKey"
         } else {
-            Write-Host "Removed OneBrowser => $taskCacheKey"
+            Write-Host "Removed OneBrowser HKLM key => $taskCacheKey"
         }
     }
 }
@@ -90,9 +95,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove OneBrowser => $regPath"
+                    Write-Host "Failed to remove OneBrowser HKU key=> $regPath"
                 } else {
-                    Write-Host "Removed OneBrowser => $regPath"
+                    Write-Host "Removed OneBrowser HKU key => $regPath"
                 }
             }
         }
