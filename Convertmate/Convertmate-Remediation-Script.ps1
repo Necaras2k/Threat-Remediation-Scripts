@@ -3,12 +3,12 @@ foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop ConvertMate process => $process"
         } else {
             Write-Host "Stopped ConvertMate process => $process"
         }
-        Start-Sleep -Seconds 2
     }
 }
 Start-Sleep -Seconds 2
