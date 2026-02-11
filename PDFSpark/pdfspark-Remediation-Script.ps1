@@ -1,12 +1,15 @@
-$process = Get-Process "PDF Spark" -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
-}
-$process = Get-Process "Spark*" -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
+$procList = @("PDF Spark", "Spark*")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop PDF Spark process => $process"
+        } else {
+            Write-Host "Stopped PDF Spark process => $process"
+        }
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -24,7 +27,9 @@ foreach ($user in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "Failed to remove PDF Spark -> $path"
+                    Write-Host "Failed to remove PDF Spark user path => $path"
+                } else {
+                    Write-Host "Removed PDF Spark user path => $path"
                 }
             }
         }
@@ -38,7 +43,9 @@ foreach ($sid in $sid_list) {
         if (Test-Path $uninstallKey) {
             Remove-Item $uninstallKey -Recurse -ErrorAction SilentlyContinue
             if (Test-Path $uninstallKey) {
-                Write-Host "Failed to remove PDF Spark -> $uninstallKey"
+                Write-Host "Failed to remove PDF Spark HKU key => $uninstallKey"
+            } else {
+                Write-Host "Removed PDF Spark HKU key => $uninstallKey"
             }
         }
     }
@@ -50,9 +57,9 @@ if (Test-Path $ldapServicePath) {
         $sparkServicePath = $_.PsPath
         Remove-Item -Path $sparkServicePath -Recurse -ErrorAction SilentlyContinue
         if (Test-Path $sparkServicePath) {
-            Write-Host "Failed to remove SparkOnSoft service -> $sparkServicePath"
+            Write-Host "Failed to remove PDF Spark HKLM key => $sparkServicePath"
         } else {
-            Write-Host "Removed SparkOnSoft service -> $sparkServicePath"
+            Write-Host "Removed PDF Spark HKLM key => $sparkServicePath"
         }
     }
 }
