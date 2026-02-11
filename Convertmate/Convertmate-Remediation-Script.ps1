@@ -19,7 +19,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $target) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
-                    "Failed to remove ConvertMate => $target"
+                    Write-Host "Failed to remove ConvertMate => $target"
+                } else {
+                    Write-Host "Removed ConvertMate => $target"
                 }
             }
         }
@@ -39,7 +41,9 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            "Failed to remove ConvertMate task entry => $taskPath"
+            Write-Host "Failed to remove ConvertMate task entry => $taskPath"
+        } else {
+            Write-Host "Removed ConvertMate task entry => $taskPath"
         }
     }
 }
@@ -54,7 +58,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path $reg) {
                 Remove-Item $reg -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $reg) {
-                    "Failed to remove ConvertMate user key => $reg"
+                    Write-Host "Failed to remove ConvertMate user key => $reg"
+                } else {
+                    Wrrite-Host "Removed ConvertMate user key => $reg"
                 }
             }
         }
@@ -70,7 +76,9 @@ foreach ($regPath in $regHKLM) {
     if (Test-Path $regPath) {
         Remove-Item $regPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path $regPath) {
-            "Failed to remove ConvertMate registry key => $regPath"
+            Write-Host "Failed to remove ConvertMate registry key => $regPath"
+        } else {
+            Write-Host "Removed ConvertMate registry key => $regPath"
         }
     }
 }
