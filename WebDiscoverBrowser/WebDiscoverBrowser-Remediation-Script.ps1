@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("browser")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop WebDiscover Browser process => $process"
+			$tracker++
         } else {
             Write-Host "Stopped WebDiscover Browser process => $process"
+			$tracker++
         }
     }
 }
@@ -24,8 +28,10 @@ foreach ($username in $user_list) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove WebDiscover Browser user path => $path"
+					$tracker++
                 } else {
                     Write-Host "Removed WebDiscover Browser user path => $path"
+					$tracker++
                 }
             }
         }
@@ -40,8 +46,10 @@ foreach ($path in $paths) {
         Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $path) {
             Write-Host "Failed to remove WebDiscover Browser system path => $path"
+			$tracker++
         } else {
             Write-Host "Removed WebDiscover Browser system path => $path"
+			$tracker++
         }
     }
 }
@@ -57,8 +65,10 @@ foreach ($taskPath in $taskPaths) {
         Remove-Item $taskPath -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
             Write-Host "Failed to WebDiscover Browser task => $taskPath"
+			$tracker++
         } else {
             Write-Host "Removed WebDiscover Browser task => $taskPath"
+			$tracker++
         }
     }
 }
@@ -70,8 +80,10 @@ foreach ($runKey in $runKeys) {
         Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
         if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
             Write-Host "Failed to remove WebDiscover Browser HKLM key => $keypath.$runKey"
+			$tracker++
         } else {
             Write-Host "Removed WebDiscover Browser HKLM key => $keypath.$runKey"
+			$tracker++
         }
     }
 }
@@ -87,8 +99,10 @@ foreach ($sid in $sid_list) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
                     Write-Host "Failed to remove WebDiscover Browser HKU key => $regPath"
+					$tracker++
                 } else {
                     Write-Host "Removed WebDiscover Browser HKU key => $regPath"
+					$tracker++
                 }
             }
         }
@@ -99,10 +113,16 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                     Write-Host "Failed to remove WebDiscover Browser HKU key => $keypath.$runKey"
+					$tracker++
                 } else {
                     Write-Host "Removed WebDiscover Browser HKU key => $keypath.$runKey"
+					$tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+	Write-Host "Nothing found to remediate"
 }
