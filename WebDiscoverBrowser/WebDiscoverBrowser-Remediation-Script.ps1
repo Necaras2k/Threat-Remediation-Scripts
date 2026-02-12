@@ -5,9 +5,9 @@ foreach ($proc in $procList) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
         Start-Sleep -Seconds 2
         if ($process) {
-            Write-Host "Failed to stop Web Discover Browser process => $process"
+            Write-Host "Failed to stop WebDiscover Browser process => $process"
         } else {
-            Write-Host "Stopped Web Discover Browser process => $process"
+            Write-Host "Stopped WebDiscover Browser process => $process"
         }
     }
 }
@@ -23,9 +23,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "Failed to remove Web Discover Browser user path => $path"
+                    Write-Host "Failed to remove WebDiscover Browser user path => $path"
                 } else {
-                    Write-Host "Removed Web Discover Browser user path => $path"
+                    Write-Host "Removed WebDiscover Browser user path => $path"
                 }
             }
         }
@@ -39,9 +39,9 @@ foreach ($path in $paths) {
     if (Test-Path -Path $path) {
         Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $path) {
-            Write-Host "Failed to remove Web Discover Browser system path => $path"
+            Write-Host "Failed to remove WebDiscover Browser system path => $path"
         } else {
-            Write-Host "Removed Web Discover Browser system path => $path"
+            Write-Host "Removed WebDiscover Browser system path => $path"
         }
     }
 }
@@ -56,9 +56,9 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            Write-Host "Failed to remove Wave Browser task => $taskPath"
+            Write-Host "Failed to WebDiscover Browser task => $taskPath"
         } else {
-            Write-Host "Removed Wave Browser task => $taskPath"
+            Write-Host "Removed WebDiscover Browser task => $taskPath"
         }
     }
 }
@@ -70,9 +70,9 @@ foreach ($reg in $regHKLM) {
     if (Test-Path -Path $reg) {
         Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
-            Write-Host "Failed to remove Web Discover Browser HKLM key => $reg"
+            Write-Host "Failed to remove WebDiscover Browser HKLM key => $reg"
         } else {
-            Write-Host "Removed Web Discover Browser HKLM key => $reg"
+            Write-Host "Removed WebDiscover Browser HKLM key => $reg"
         }
     }
 }
@@ -88,9 +88,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove Web Discover Browser HKU key => $regPath"
+                    Write-Host "Failed to remove WebDiscover Browser HKU key => $regPath"
                 } else {
-                    Write-Host "Removed Web Discover Browser HKU key => $regPath"
+                    Write-Host "Removed WebDiscover Browser HKU key => $regPath"
                 }
             }
         }
