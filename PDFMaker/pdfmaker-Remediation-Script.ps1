@@ -125,7 +125,7 @@ foreach ($service in $services) {
             } else {
                 Get-WmiObject -Class Win32_Service -Filter "Name='*PDF*'" | Remove-WmiObject
             }
-            if ($svc)
+            if ($svc) {
                 Write-Host "Failed to remove PDF Maker service => $svc"
             } else {
                 Write-Host "Removed PDF Maker ervice => $svc"
