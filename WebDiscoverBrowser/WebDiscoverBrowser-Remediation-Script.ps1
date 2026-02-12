@@ -63,16 +63,15 @@ foreach ($taskPath in $taskPaths) {
     }
 }
 
-$regHKLM = @(
-    "Registry::HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
-)
-foreach ($reg in $regHKLM) {
-    if (Test-Path -Path $reg) {
-        Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
-        if (Test-Path -Path $reg) {
-            Write-Host "Failed to remove WebDiscover Browser HKLM key => $reg"
+$runKeys = @("WebDiscoverBrowser")
+foreach ($runKey in $runKeys) {
+    $keypath = "Registry::HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+    if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+        Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
+        if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+            Write-Host "Failed to remove WebDiscover Browser HKLM key => $keypath.$runKey"
         } else {
-            Write-Host "Removed WebDiscover Browser HKLM key => $reg"
+            Write-Host "Removed WebDiscover Browser HKLM key => $keypath.$runKey"
         }
     }
 }
@@ -81,8 +80,7 @@ $sid_list = Get-Item -Path "Registry::HKU\S-*" | Select-String -Pattern "S-\d-(?
 foreach ($sid in $sid_list) {
     if ($sid -notlike "*_Classes*") {
         $regHKU = @(
-            "Registry::$sid\Software\WebDiscoverBrowser",
-			"Registry::$sid\Software\Microsoft\Windows\CurrentVersion\Run\WebDiscoverBrowser"
+            "Registry::$sid\Software\WebDiscoverBrowser"
         )
         foreach ($regPath in $regHKU) {
             if (Test-Path -Path $regPath) {
@@ -91,6 +89,18 @@ foreach ($sid in $sid_list) {
                     Write-Host "Failed to remove WebDiscover Browser HKU key => $regPath"
                 } else {
                     Write-Host "Removed WebDiscover Browser HKU key => $regPath"
+                }
+            }
+        }
+        $runKeys = @("WebDiscoverBrowser")
+        foreach ($runKey in $runKeys) {
+            $keypath = "Registry::$sid\Software\Microsoft\Windows\CurrentVersion\Run"
+            if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+                Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
+                if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+                    Write-Host "Failed to remove WebDiscover Browser HKU key => $keypath.$runKey"
+                } else {
+                    Write-Host "Removed WebDiscover Browser HKU key => $keypath.$runKey"
                 }
             }
         }
