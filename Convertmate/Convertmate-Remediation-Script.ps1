@@ -99,6 +99,7 @@ foreach ($regPath in $regHKLM) {
         }
     }
 }
+
 if ($tracker -eq 0) {
     Write-Host "Nothing found to remediate"
 }
