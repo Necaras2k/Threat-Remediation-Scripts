@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("Easy2Convert")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop Easy2Convert process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped Easy2Convert process => $process"
+            $tracker++
         }
     }
 }
@@ -24,20 +28,23 @@ foreach ($username in $user_list) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove Easy2Convert user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed Easy2Convert user path => $path"
+                    $tracker++
                 }
             }
         }
-
         $installers = @(Get-ChildItem "C:\Users\$username\Downloads" -Filter "Easy2Convert*.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
         foreach ($install in $installers) {
             if (Test-Path $install) {
                 Remove-Item $install -Force -ErrorAction SilentlyContinue
                 if (Test-Path $install) {
                     Write-Host "Failed to remove Easy2Convert installer => $install"
+                    $tracker++
                 } else {
                     Write-Host "Removed Easy2Convert installer => $install"
+                    $tracker++
                 }
             }
         }
@@ -58,8 +65,10 @@ foreach ($taskPath in $taskPaths) {
         Remove-Item $taskPath -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path $taskPath) {
             Write-Host "Failed to remove Easy2Convert task => $taskPath"
+            $tracker++
         } esle {
             Write-Host "Removed Easy2Convert task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -75,10 +84,16 @@ foreach ($sid in $sid_list) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path $regPath) {
                     Write-Host "Failed to remove Easy2Convert HKU Registry => $regPath"
+                    $tracker++
                 } esle {
                     Write-Host "Removed Easy2Convert HKU Registry => $regPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
