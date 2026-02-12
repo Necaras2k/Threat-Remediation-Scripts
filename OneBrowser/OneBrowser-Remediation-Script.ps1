@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("OneBrowser", "OBUpdateService")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop OneBrowser proccess => $process"
+            $tracker++
         } else {
             Write-Host "Stopped OneBrowse process => $process"
+            $tracker++
         }
     }
 }
@@ -21,24 +25,26 @@ foreach ($user in $user_list) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
                 Write-Host "Failed to remove OneBrowser installer => $install"
+                $tracker++
             } else {
                 Write-Host "Removed OneBrowser installer => $install"
+                $tracker++
             }
         }
     }
-
     $installers = @(Get-ChildItem "C:\users\$user\Downloads" -Recurse -Filter "*OneBrowser*.msi" | ForEach-Object { $_.FullName })
     foreach ($install in $installers) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
                 Write-Host "Failed to remove OneBrowser installer => $install"
+                $tracker++
             } else {
                 Write-Host "Removed OneBrowser installer => $install"
+                $tracker++
             }
         }
     }
-
     $paths = @(
         "C:\Users\$user\AppData\Local\OneBrowser",
         "C:\Users\$user\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneBrowser.lnk"
@@ -48,8 +54,10 @@ foreach ($user in $user_list) {
             Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $path) {
                 Write-Host "Failed to remove OneBrowser user path => $path"
+                $tracker++
             } else {
                 Write-Host "Removed OneBrowser user path => $path"
+                $tracker++
             }
         }
     }
@@ -57,15 +65,16 @@ foreach ($user in $user_list) {
 
 $tasks = @(
     "C:\Windows\System32\Tasks\OBUpdate"
-
 )
 foreach ($task in $tasks) {
     if (Test-Path -Path $task) {
         Remove-Item $task -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $task) {
             Write-Host "Failed to remove OneBrowser task => $task"
+            $tracker++
         } else {
             Write-Host "Removed OneBrowser task => $task"
+            $tracker++
         }
     }
 }
@@ -78,8 +87,10 @@ foreach ($taskCacheKey in $taskCacheKeys) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
             Write-Host "Failed to remove OneBrowser HKLM key => $taskCacheKey"
+            $tracker++
         } else {
             Write-Host "Removed OneBrowser HKLM key => $taskCacheKey"
+            $tracker++
         }
     }
 }
@@ -96,10 +107,16 @@ foreach ($sid in $sid_list) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
                     Write-Host "Failed to remove OneBrowser HKU key=> $regPath"
+                    $tracker++
                 } else {
                     Write-Host "Removed OneBrowser HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
