@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("wavebrowser", "SWUpdater")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop Wave Browser process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped Wave Browser process => $process"
+            $tracker++
         }
     }
 }
@@ -32,8 +36,10 @@ foreach ($username in $user_list) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove Wave Browser user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed Wave Browser user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -54,8 +60,10 @@ foreach ($taskPath in $taskPaths) {
         Remove-Item $taskPath -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
             Write-Host "Failed to remove Wave Browser task => $taskPath"
+            $tracker++
         } else {
             Write-Host "Removed Wave Browser task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -79,8 +87,10 @@ foreach ($sid in $sid_list) {
                 Remove-Item $keypath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $keypath) {
                     Write-Host "Failed to remove Wave Browser HKU key => $keypath"
+                    $tracker++
                 } else {
                     Write-Host "Removed Wave Browser HKU key => $keypath"
+                    $tracker++
                 }
             }
         }
@@ -90,8 +100,10 @@ foreach ($sid in $sid_list) {
             Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Write-Host "Failed to remove Wave Browser HKU key => $keypath.$runKey"
+                v
             } else {
                 Write-Host "Removed Wave Browser HKU key => $keypath.$runKey"
+                $tracker++
             }
         }
         $runKey = "WaveBrowser.5QMLTPZDDJG2BQZHV26QUN4ZK4"
@@ -100,8 +112,10 @@ foreach ($sid in $sid_list) {
             Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Write-Host "Failed to remove Wave Browser HKU key => $keypath.$runKey"
+                $tracker++
             } else {
                 Write-Host "Removed Wave Browser HKU key => $keypath.$runKey"
+                $tracker++
             }
         }
     }
@@ -130,10 +144,16 @@ foreach ($sid in $sid_list) {
                 Remove-Item $classPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $classPath) {
                     Write-Host "Failed to remove Wave Browser HKU key => $classPath"
+                    $tracker++
                 } else {
                     Write-Host "Removed Wave Browser HKU key => $classPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
