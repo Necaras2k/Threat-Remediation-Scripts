@@ -8,6 +8,7 @@ foreach ($proc in $procList) {
             Write-Host "Failed to stop OneStart process => $process"
         } else {
             Write-Host "Stopped OneStart process => $process"
+        }
     }
 }
 Start-Sleep -Seconds 2
@@ -25,6 +26,7 @@ foreach ($user in $user_list) {
             }
         }
     }
+}
 
     $installers = @(Get-ChildItem "C:\users\$user\Downloads" -Recurse -Filter "*OneStart*.msi" | ForEach-Object { $_.FullName })
     foreach ($install in $installers) {
