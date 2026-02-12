@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("upd", "PDFMaker", "PDFast")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop PDF Maker process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped PDF Maker process => $process"
+            $tracker++
         }
     }
 }
@@ -29,8 +33,10 @@ foreach ($user in $user_list) {
                 Remove-Item -Path $path -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove PDF Maker user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed PDF Maker user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -45,8 +51,10 @@ foreach ($path in $paths) {
         Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $path) {
             Write-Host "Failed to remove PDF Maker system path => $path"
+            $tracker++
         } else {
             Write-Host "Removed PDF Maker system path => $path"
+            $tracker++
         }
     }
 }
@@ -69,8 +77,10 @@ foreach ($sid in $sid_list) {
                 Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
                     Write-Host "Failed to remove PDF Maker HKU key -> $regPath"
+                    $tracker++
                 } else {
                     Write-Host "Removed PDF Maker HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
@@ -87,8 +97,10 @@ foreach ($task in $tasks) {
         Remove-Item -Path $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
             Write-Host "Failed to remove PDF Maker task => $taskPath"
+            $tracker++
         } else {
             Write-Host "Removed PDF maker task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -104,8 +116,10 @@ foreach ($regKey in $regKeys) {
         Remove-Item -Path $regKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $regKey) {
             Write-Host "Failed to remove PDF Maker HKLM key => $regKey"
+            $tracker++
         } else {
             Write-Host "Removed PDF Maker HKLM key => $regKey"
+            $tracker++
         }
     }
 }
@@ -118,8 +132,10 @@ foreach ($service in $services) {
         Start-Sleep -Seconds 15
         if ($svc) {
             Write-Host "Failed to stop PDF Maker service => $svc"
+            $tracker++
         } else {
             Write-Host "Stopped PDF Maker service => $svc"
+            $tracker++
             if ($PSVersionTable.PSVersion.Major -ge 6) {
                 Remove-Service -Name $svc -Force -ErrorAction SilentlyContinue
             } else {
@@ -127,9 +143,15 @@ foreach ($service in $services) {
             }
             if ($svc) {
                 Write-Host "Failed to remove PDF Maker service => $svc"
+                $tracker++
             } else {
                 Write-Host "Removed PDF Maker ervice => $svc"
+                $tracker++
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
