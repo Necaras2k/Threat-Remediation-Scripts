@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("DSOne", "DSOneWD")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop DSOne Agent process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped DSOne Agent process => $process"
+            $tracker++
         }
     }
 }
@@ -24,8 +28,10 @@ foreach ($username in $user_list) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
                     Write-Host "Failed to remove DSOne Agent installer => $target"
+                    $tracker++
                 } else {
                     Write-Host "Removed DSOne Agent installer => $target"
+                    $tracker++
                 }
             }
         }
@@ -40,8 +46,10 @@ foreach ($path in $paths) {
         Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $path) {
             Write-Host "Failed to remove DSOne Agent system path => $path"
+            $tracker++
         } else {
             Write-Host "Removed DSOne Agent system path => $path"
+            $tracker++
         }
     }
 }
@@ -60,8 +68,14 @@ foreach ($taskPath in $taskPaths) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
             Write-Host "Failed to remove DSOne Agent task => $taskPath"
+            $tracker++
         } else {
             Write-Host "Removed DSOne Agent task => $taskPath"
+            $tracker++
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
