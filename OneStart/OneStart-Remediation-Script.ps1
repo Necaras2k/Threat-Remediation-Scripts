@@ -42,6 +42,7 @@ foreach ($user in $user_list) {
             } else {
                 Write-Host "Removed OneStart installer => $install"
                 $tracker++
+            }
         }
     }
     $paths = @(
