@@ -15,7 +15,7 @@ Start-Sleep -Seconds 2
 
 $user_list = Get-Item C:\users\* | Select-Object Name -ExpandProperty Name
 foreach ($user in $user_list) {
-    $installers = @(Get-ChildItem C:\users\$user -Recurse -Filter "OneLaunch*.exe" | ForEach-Object { $_.FullName })
+    $installers = @(Get-ChildItem C:\users\$user\Downloads -Recurse -Filter "OneLaunch*.exe" | ForEach-Object { $_.FullName })
     foreach ($install in $installers) {
         if (Test-Path -Path $install) {
             Remove-Item -Path $install -Force -ErrorAction SilentlyContinue
