@@ -1,12 +1,15 @@
-$process = Get-Process wavebrowser -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
-}
-$process = Get-Process SWUpdater -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
+$procList = @("wavebrowser", "SWUpdater")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        if ($process) {
+            Write-Host "Failed to stop Wave Browser process => $process"
+        } else {
+            Write-Host "Stopped Wave Browser process => $process"
+        }
+    }
 }
 Start-Sleep -Seconds 2
 
@@ -28,7 +31,9 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "WaveBrowser Removal Unsuccessful => $path"
+                    Write-Host "Failed to remove Wave Browser user path => $path"
+                } else {
+                    Write-Host "Removed Wave Browser user path => $path"
                 }
             }
         }
@@ -47,6 +52,11 @@ $taskPaths = @(
 foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $taskPath) {
+            Write-Host "Failed to remove Wave Browser task => $taskPath"
+        } else {
+            Write-Host "Removed Wave Browser task => $taskPath"
+        }
     }
 }
 
@@ -68,7 +78,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $keypath) {
                 Remove-Item $keypath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $keypath) {
-                    Write-Host "WaveBrowser Removal Unsuccessful => $keypath"
+                    Write-Host "Failed to remove Wave Browser HKU key => $keypath"
+                } else {
+                    Write-Host "Removed Wave Browser HKU key => $keypath"
                 }
             }
         }
@@ -77,7 +89,9 @@ foreach ($sid in $sid_list) {
         if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
             Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                Write-Host "WaveBrowser Removal Unsuccessful => $keypath.$runKey"
+                Write-Host "Failed to remove Wave Browser HKU key => $keypath.$runKey"
+            } else {
+                Write-Host "Removed Wave Browser HKU key => $keypath.$runKey"
             }
         }
         $runKey = "WaveBrowser.5QMLTPZDDJG2BQZHV26QUN4ZK4"
@@ -85,7 +99,9 @@ foreach ($sid in $sid_list) {
         if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
             Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                Write-Host "WaveBrowser Removal Unsuccessful => $keypath.$runKey"
+                Write-Host "Failed to remove Wave Browser HKU key => $keypath.$runKey"
+            } else {
+                Write-Host "Removed Wave Browser HKU key => $keypath.$runKey"
             }
         }
     }
@@ -113,7 +129,9 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $classPath) {
                 Remove-Item $classPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $classPath) {
-                    Write-Host "WaveBrowser Removal Unsuccessful => $classPath"
+                    Write-Host "Failed to remove Wave Browser HKU key => $classPath"
+                } else {
+                    Write-Host "Removed Wave Browser HKU key => $classPath"
                 }
             }
         }
