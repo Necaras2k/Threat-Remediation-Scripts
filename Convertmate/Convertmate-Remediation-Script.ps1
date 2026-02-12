@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("Convert Mate", "UpdateRetreiver")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop ConvertMate process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped ConvertMate process => $process"
+            $tracker++
         }
     }
 }
@@ -25,8 +29,10 @@ foreach ($username in $user_list) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
                     Write-Host "Failed to remove ConvertMate user path => $target"
+                    $tracker++
                 } else {
                     Write-Host "Removed ConvertMate user path => $target"
+                    $tracker++
                 }
             }
         }
@@ -47,8 +53,10 @@ foreach ($taskPath in $taskPaths) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
             Write-Host "Failed to remove ConvertMate task => $taskPath"
+            $tracker++
         } else {
             Write-Host "Removed ConvertMate task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -64,8 +72,10 @@ foreach ($sid in $sid_list) {
                 Remove-Item $reg -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $reg) {
                     Write-Host "Failed to remove ConvertMate HKU key => $reg"
+                    $tracker++
                 } else {
                     Wrrite-Host "Removed ConvertMate HKU key => $reg"
+                    $tracker++
                 }
             }
         }
@@ -82,8 +92,13 @@ foreach ($regPath in $regHKLM) {
         Remove-Item $regPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path $regPath) {
             Write-Host "Failed to remove ConvertMate HKLM key => $regPath"
+            $tracker++
         } else {
             Write-Host "Removed ConvertMate HKLM key => $regPath"
+            $tracker++
         }
     }
+}
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
