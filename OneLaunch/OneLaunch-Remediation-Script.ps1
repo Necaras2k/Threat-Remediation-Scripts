@@ -154,6 +154,7 @@ foreach ($task in $tasks) {
             Write-Host "Failed to remove OneLaunch task => $taskPath"
         } else {
             Write-Host "Removed OneLaunch task => $taskPath"
+        }
     }
 }
 
