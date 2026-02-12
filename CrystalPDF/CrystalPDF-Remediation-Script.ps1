@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("CrystalPDF")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop CrystalPDF process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped CrystalPDF process => $process"
+            $tracker++
         }
     }
 }
@@ -27,8 +31,10 @@ foreach ($user in $user_list) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove CrystalPDF user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed CrystalPDF user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -44,14 +50,15 @@ foreach ($reg in $regHKLM) {
         Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
             Write-Host "Failed to remove CrystalPDF HKLM key => $reg"
+            $tracker++
         } else {
             Write-Host "Removed CrystalPDF HKLM key => $reg"
+            $tracker++
         }
     }
 }
 
 $sid_list = Get-Item -Path "Registry::HKU\S-*" | Select-String -Pattern "S-\d-(?:\d+-){5,14}\d+" | ForEach-Object { $_.ToString().Trim() }
-
 foreach ($sid in $sid_list) {
     if ($sid -notlike "*_Classes*") {
         $regHKU = @(
@@ -64,10 +71,16 @@ foreach ($sid in $sid_list) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
                     Write-Host "Failed to remove CrystalPDF HKU key => $regPath"
+                    $tracker++
                 } else {
                     Write-Host "Removed CrystalPDF HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
