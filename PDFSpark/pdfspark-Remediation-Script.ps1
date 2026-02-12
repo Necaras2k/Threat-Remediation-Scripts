@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("PDF Spark", "Spark*")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop PDF Spark process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped PDF Spark process => $process"
+            $tracker++
         }
     }
 }
@@ -28,8 +32,10 @@ foreach ($user in $user_list) {
                 Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
                     Write-Host "Failed to remove PDF Spark user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed PDF Spark user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -44,8 +50,10 @@ foreach ($sid in $sid_list) {
             Remove-Item $uninstallKey -Recurse -ErrorAction SilentlyContinue
             if (Test-Path $uninstallKey) {
                 Write-Host "Failed to remove PDF Spark HKU key => $uninstallKey"
+                $tracker++
             } else {
                 Write-Host "Removed PDF Spark HKU key => $uninstallKey"
+                $tracker++
             }
         }
     }
@@ -58,8 +66,14 @@ if (Test-Path $ldapServicePath) {
         Remove-Item -Path $sparkServicePath -Recurse -ErrorAction SilentlyContinue
         if (Test-Path $sparkServicePath) {
             Write-Host "Failed to remove PDF Spark HKLM key => $sparkServicePath"
+            $tracker++
         } else {
             Write-Host "Removed PDF Spark HKLM key => $sparkServicePath"
+            $tracker++
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
