@@ -1,3 +1,5 @@
+$tracker = 0
+
 $procList = @("PCAppStore", "NW_store", "Watchdog")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
@@ -6,8 +8,10 @@ foreach ($proc in $procList) {
         Start-Sleep -Seconds 2
         if ($process) {
             Write-Host "Failed to stop PC App Store process => $process"
+            $tracker++
         } else {
             Write-Host "Stopped PC App Store process => $process"
+            $tracker++
         }
     }
 }
@@ -26,8 +30,10 @@ foreach ($user in $user_list) {
                 Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path $path) {
                     Write-Host "Failed to remove PC App Store user path => $path"
+                    $tracker++
                 } else {
                     Write-Host "Removed PC App Store user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -36,8 +42,10 @@ foreach ($user in $user_list) {
             Remove-Item $path -ErrorAction SilentlyContinue
             if (Test-Path $path) {
                 Write-Host "Failed to remove PC App Store installer => $path"
+                $tracker++
             } else {
                 Write-Host "Removed PC App Store installer => $path"
+                $tracker++
             }
         }
     }
@@ -57,8 +65,10 @@ foreach ($sid in $sid_list) {
                 Remove-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue
                 if (Get-ItemProperty -Path $keypath -Name $key -ErrorAction SilentlyContinue) {
                     Write-Host "Failed to remove PC App Store HKU key => $keypath.$key"
+                    $tracker++
                 } else {
                     Write-Host "Removed PC App Store HKU key => $keypath.$key"
+                    $tracker++
                 }
             }
         }
@@ -67,8 +77,10 @@ foreach ($sid in $sid_list) {
             Remove-Item -Path $path -Recurse -ErrorAction SilentlyContinue
             if (Test-Path $path) {
                 Write-Host "Failed to remove PC App Store HKU key => $path"
+                $tracker++
             } else {
                 Write-Host "Removed PC App Store HKU key => $path"
+                $tracker++
             }
         }
     }
@@ -82,8 +94,10 @@ foreach ($task in $tasks) {
         Remove-Item $task -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $task) {
             Write-Host "Failed to remove PC App Store task => $task"
+            $tracker++
         } else {
             Write-Host "Removed PC App Store task => $task"
+            $tracker++
         }
     }
 }
@@ -96,8 +110,14 @@ foreach ($taskCacheKey in $taskCacheKeys) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
             Write-Host "Failed to PC App Store HKLM key => $taskCacheKey"
+            $tracker++
         } else {
             Write-Host "Removed PC App Store HKLM key => $taskCacheKey"
+            $tracker++
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
