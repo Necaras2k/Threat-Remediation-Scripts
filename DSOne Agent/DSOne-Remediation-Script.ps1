@@ -1,6 +1,6 @@
 $tracker = 0
 
-$procList = @("DSOne", "DSOneWD")
+$procList = @("DSOne", "DSOneWD", "DSOneWeb", "DSOneWebWD")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
@@ -21,7 +21,8 @@ $user_list = Get-Item C:\Users\* | Select-Object -ExpandProperty Name
 foreach ($username in $user_list) {
     if ($username -notlike "*Public*") {
         $targets = @(
-            "C:\Users\$username\downloads\DSOne*.exe"
+            "C:\Users\$username\downloads\DSOne*.exe",
+            "C:\Users\$username\downloads\DriverUpdate.exe"
         )
         foreach ($target in $targets) {
             if (Test-Path -Path $target) {
