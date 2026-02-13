@@ -5,7 +5,7 @@ foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
+        Start-Sleep -Seconds 5
         if ($process) {
             Write-Host "Failed to stop PDF Pro Suite process => $process"
             $tracker++
@@ -15,7 +15,7 @@ foreach ($proc in $procList) {
         }
     }
 }
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\Users\* | Select-Object -ExpandProperty Name
 foreach ($user in $user_list) {
