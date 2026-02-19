@@ -6,6 +6,7 @@ foreach ($proc in $procList) {
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
         Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
         if ($process) {
             Write-Host "Failed to stop Wave Browser process => $process"
             $tracker++
