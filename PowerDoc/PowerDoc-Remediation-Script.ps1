@@ -103,3 +103,7 @@ foreach ($sid in $sid_list) {
         }
     }
 }
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
+}
