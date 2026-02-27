@@ -23,6 +23,7 @@ foreach ($user in $user_list) {
     if ($user -notlike "*Public*") {
         $paths = @(
             "C:\Users\$user\Downloads\Spark*.exe",
+            "C:\Users\$user\Downloads\PDFSpark*.exe",
             "C:\Users\$user\AppData\Local\Programs\PDF Spark",
             "C:\Users\$user\AppData\Roaming\pdf-spark-nativefier*",
             "C:\Users\$user\Desktop\PDF Spark.lnk",
