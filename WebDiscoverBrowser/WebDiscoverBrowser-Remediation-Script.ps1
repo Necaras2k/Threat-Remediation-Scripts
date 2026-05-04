@@ -1,67 +1,129 @@
-$sid_list = Get-Item -Path "Registry::HKU\*" | Select-String -Pattern "S-\d-(?:\d+-){5,14}\d+"
+$tracker = 0
+
+$procList = @("browser")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 5
+		$process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop WebDiscover Browser process => $process"
+			$tracker++
+        } else {
+            Write-Host "Stopped WebDiscover Browser process => $process"
+			$tracker++
+        }
+    }
+}
+Start-Sleep -Seconds 5
+
 $user_list = Get-Item C:\users\* | Select-Object Name -ExpandProperty Name
-
-# Terminate Process
-
-Get-Process browser -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-sleep 2
-
-# Remove from file system
-
-rm "C:\Program Files\WebDiscoverBrowser" -Force -Recurse -ErrorAction SilentlyContinue
-rm "C:\windows\system32\tasks\WebDiscover Browser Launch Task" -ErrorAction SilentlyContinue
-rm "C:\windows\system32\tasks\WebDiscover Browser Update Task" -ErrorAction SilentlyContinue
-
-foreach ($i in $user_list) {
-    if ($i -notlike "*Public*") {
-        rm "C:\users\$i\AppData\Local\WebDiscoverBrowser" -Force -Recurse -ErrorAction SilentlyContinue -ErrorVariable DirectoryError
-    }
-}
-
-# Remove from Registries
-
-Remove-Item -path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Launch Task" -Recurse -ErrorAction SilentlyContinue
-Remove-Item -path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Update Task" -Recurse -ErrorAction SilentlyContinue
-Remove-ItemProperty -path "Registry::HKLM\Software\Microsoft\Windows\CurrentVersion\Run" -name WebDiscoverBrowser -ErrorAction SilentlyContinue
-
-foreach ($i in $sid_list) {
-    if ($i -notlike "*_Classes*") {
-        Remove-Item -Path Registry::$i\Software\WebDiscoverBrowser -Recurse -ErrorAction SilentlyContinue
-        Remove-ItemProperty -Path "Registry::$i\Software\Microsoft\Windows\CurrentVersion\Run" -Name WebDiscoverBrowser -ErrorAction SilentlyContinue
-    }
-}
-
-# Check Removal
-
-foreach ($i in $user_list) {
-    if ($i -notlike "*Public*") {
-	    $result = test-path -Path "C:\users\$i\AppData\Local\WebDiscoverBrowser"
-        if ($result -eq "True") {
-            "WebDiscover Browser wasn't removed => on C:\users\$i\AppData\Local\WebDiscoverBrowser"
+foreach ($username in $user_list) {
+    if ($username -notlike "*Public*") {
+        $paths = @(
+            "C:\users\$username\AppData\Local\WebDiscoverBrowser"
+        )
+        foreach ($path in $paths) {
+            if (Test-Path -Path $path) {
+                Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
+                if (Test-Path -Path $path) {
+                    Write-Host "Failed to remove WebDiscover Browser user path => $path"
+					$tracker++
+                } else {
+                    Write-Host "Removed WebDiscover Browser user path => $path"
+					$tracker++
+                }
+            }
         }
     }
 }
 
-$check1 = Test-Path -path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Launch Task" -ErrorAction SilentlyContinue
-if ($check1) {
-    "This script failed to remove Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Launch Task"
-}
-else {
-    continue
+$paths = @(
+    "C:\Program Files\WebDiscoverBrowser"
+)
+foreach ($path in $paths) {
+    if (Test-Path -Path $path) {
+        Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $path) {
+            Write-Host "Failed to remove WebDiscover Browser system path => $path"
+			$tracker++
+        } else {
+            Write-Host "Removed WebDiscover Browser system path => $path"
+			$tracker++
+        }
+    }
 }
 
-$check2 = Test-Path -path "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Update Task" -ErrorAction SilentlyContinue
-if ($check2) {
-    "This script failed to remove Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Update Task"
-}
-else {
-    continue
+$taskPaths = @(
+    'C:\windows\system32\tasks\WebDiscover Browser Launch Task',
+    'C:\windows\system32\tasks\WebDiscover Browser Update Task',
+	'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Launch Task',
+	'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\TREE\WebDiscover Browser Update Task'
+)
+foreach ($taskPath in $taskPaths) {
+    if (Test-Path -Path $taskPath) {
+        Remove-Item $taskPath -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $taskPath) {
+            Write-Host "Failed to WebDiscover Browser task => $taskPath"
+			$tracker++
+        } else {
+            Write-Host "Removed WebDiscover Browser task => $taskPath"
+			$tracker++
+        }
+    }
 }
 
-$check2 = Test-Path -path "C:\Program Files\WebDiscoverBrowser" -ErrorAction SilentlyContinue
-if ($check2) {
-    "This script failed to remove C:\Program Files\WebDiscoverBrowser"
+$runKeys = @("WebDiscoverBrowser")
+foreach ($runKey in $runKeys) {
+    $keypath = "Registry::HKLM\Software\Microsoft\Windows\CurrentVersion\Run"
+    if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+        Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
+        if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+            Write-Host "Failed to remove WebDiscover Browser HKLM key => $keypath.$runKey"
+			$tracker++
+        } else {
+            Write-Host "Removed WebDiscover Browser HKLM key => $keypath.$runKey"
+			$tracker++
+        }
+    }
 }
-else {
-    continue
+
+$sid_list = Get-Item -Path "Registry::HKU\S-*" | Select-String -Pattern "S-\d-(?:\d+-){5,14}\d+" | ForEach-Object { $_.ToString().Trim() }
+foreach ($sid in $sid_list) {
+    if ($sid -notlike "*_Classes*") {
+        $regHKU = @(
+            "Registry::$sid\Software\WebDiscoverBrowser"
+        )
+        foreach ($regPath in $regHKU) {
+            if (Test-Path -Path $regPath) {
+                Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
+                if (Test-Path -Path $regPath) {
+                    Write-Host "Failed to remove WebDiscover Browser HKU key => $regPath"
+					$tracker++
+                } else {
+                    Write-Host "Removed WebDiscover Browser HKU key => $regPath"
+					$tracker++
+                }
+            }
+        }
+        $runKeys = @("WebDiscoverBrowser")
+        foreach ($runKey in $runKeys) {
+            $keypath = "Registry::$sid\Software\Microsoft\Windows\CurrentVersion\Run"
+            if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+                Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
+                if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
+                    Write-Host "Failed to remove WebDiscover Browser HKU key => $keypath.$runKey"
+					$tracker++
+                } else {
+                    Write-Host "Removed WebDiscover Browser HKU key => $keypath.$runKey"
+					$tracker++
+                }
+            }
+        }
+    }
+}
+
+if ($tracker -eq 0) {
+	Write-Host "Nothing found to remediate"
 }
