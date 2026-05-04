@@ -1,12 +1,22 @@
-$process = Get-Process OneStart -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
+$tracker = 0
+
+$procList = @("OneStart", "UpdaterSetup")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop OneStart process => $process"
+            $tracker++
+        } else {
+            Write-Host "Stopped OneStart process => $process"
+            $tracker++
+        }
+    }
 }
-$process = Get-Process UpdaterSetup -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-}
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\users\* | Select-Object Name -ExpandProperty Name
 foreach ($user in $user_list) {
@@ -15,21 +25,27 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
-                Write-Host "Failed to remove OneStart installer -> $install"
+                Write-Host "Failed to remove OneStart installer => $install"
+                $tracker++
+            } else {
+                Write-Host "Removed OneStart installer => $install"
+                $tracker++
             }
         }
     }
-
     $installers = @(Get-ChildItem "C:\users\$user\Downloads" -Recurse -Filter "*OneStart*.msi" | ForEach-Object { $_.FullName })
     foreach ($install in $installers) {
         if (Test-Path -Path $install) {
             Remove-Item $install -ErrorAction SilentlyContinue
             if (Test-Path -Path $install) {
-                Write-Host "Failed to remove OneStart installer -> $install"
+                Write-Host "Failed to remove OneStart installer => $install"
+                $tracker++
+            } else {
+                Write-Host "Removed OneStart installer => $install"
+                $tracker++
             }
         }
     }
-
     $paths = @(
         "C:\Users\$user\AppData\Local\OneStart.ai",
         "C:\Users\$user\OneStart.ai",
@@ -44,7 +60,11 @@ foreach ($user in $user_list) {
         if (Test-Path -Path $path) {
             Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $path) {
-                Write-Host "Failed to remove OneStart -> $path"
+                Write-Host "Failed to remove OneStart user path => $path"
+                $tracker++
+            } else {
+                Write-Host "Removed OneStart user path => $path"
+                $tracker++
             }
         }
     }
@@ -58,7 +78,11 @@ foreach ($path in $paths) {
     if (test-path -Path $path) {
         Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
             if (Test-Path -Path $path) {
-                Write-Host "Failed to remove OneStart -> $path"
+                Write-Host "Failed to remove OneStart system path => $path"
+                $tracker++
+            } else {
+                Write-Host "Removed OneStart system path => $path"
+                $tracker++
             }
     }
 }    
@@ -69,13 +93,16 @@ $tasks = @(
     "C:\Windows\System32\Tasks\PDFEditorScheduledTask",
     "C:\Windows\System32\Tasks\PDFEditorUScheduledTask",
     "C:\Windows\System32\Tasks\sys_component_health_*"
-
 )
 foreach ($task in $tasks) {
     if (Test-Path -Path $task) {
         Remove-Item $task -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $task) {
-            Write-Host "Failed to remove OneStart task -> $task"
+            Write-Host "Failed to remove OneStart task => $task"
+            $tracker++
+        } else {
+            Write-Host "Removed OneStart task => $task"
+            $tracker++
         }
     }
 }
@@ -92,7 +119,11 @@ foreach ($taskCacheKey in $taskCacheKeys) {
     if (Test-Path -Path $taskCacheKey) {
         Remove-Item $taskCacheKey -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskCacheKey) {
-            Write-Host "Failed to remove OneStart -> $taskCacheKey"
+            Write-Host "Failed to remove OneStart HKLM key => $taskCacheKey"
+            $tracker++
+        } else {
+            Write-Host "Removed OneStart HKLM key => $taskCacheKey"
+            $tracker++
         }
     }
 }
@@ -106,7 +137,11 @@ foreach ($key in $registryKeys) {
     if (Test-Path -Path $key) {
         Remove-Item $key -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $key) {
-            Write-Host "Failed to remove OneStart -> $key"
+            Write-Host "Failed to remove OneStart HKLM key => $key"
+            $tracker++
+        } else {
+            Write-Host "Removed OneStart HKLM key => $key"
+            $tracker++
         }
     }
 }
@@ -132,7 +167,11 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove OneStart -> $regPath"
+                    Write-Host "Failed to remove OneStart HKU key => $regPath"
+                    $tracker++
+                } else {
+                    Write-Host "Removed OneStart HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
@@ -142,7 +181,11 @@ foreach ($sid in $sid_list) {
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                    Write-Host "Failed to remove OneStart -> $keypath.$runKey"
+                    Write-Host "Failed to remove OneStart HKU key => $keypath.$runKey"
+                    $tracker++
+                } else {
+                    Write-Host "Removed OneStart HKU key => $keypath.$runKey"
+                    $tracker++
                 }
             }
         }
@@ -152,9 +195,17 @@ foreach ($sid in $sid_list) {
             if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
                 Remove-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue
                 if ((Get-ItemProperty -Path $keypath -Name $runKey -ErrorAction SilentlyContinue)) {
-                    Write-Host "Failed to remove OneStart -> $keypath.$runKey"
+                    Write-Host "Failed to remove OneStart HKU key => $keypath.$runKey"
+                    $tracker++
+                } else {
+                    Write-Host "Removed OneStart HKU key => $keypath.$runKey"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
