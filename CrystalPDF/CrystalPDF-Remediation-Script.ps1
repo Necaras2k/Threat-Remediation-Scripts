@@ -1,8 +1,22 @@
-$process = Get-Process CrystalPDF -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
+$tracker = 0
+
+$procList = @("CrystalPDF")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop CrystalPDF process => $process"
+            $tracker++
+        } else {
+            Write-Host "Stopped CrystalPDF process => $process"
+            $tracker++
+        }
+    }
 }
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\Users\* | Select-Object -ExpandProperty Name
 foreach ($user in $user_list) {
@@ -17,7 +31,11 @@ foreach ($user in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    "Failed to remove CrystalPDF -> $path"
+                    Write-Host "Failed to remove CrystalPDF user path => $path"
+                    $tracker++
+                } else {
+                    Write-Host "Removed CrystalPDF user path => $path"
+                    $tracker++
                 }
             }
         }
@@ -32,13 +50,16 @@ foreach ($reg in $regHKLM) {
     if (Test-Path -Path $reg) {
         Remove-Item -Path $reg -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
-            "Failed to remove CrystalPDF -> $reg"
+            Write-Host "Failed to remove CrystalPDF HKLM key => $reg"
+            $tracker++
+        } else {
+            Write-Host "Removed CrystalPDF HKLM key => $reg"
+            $tracker++
         }
     }
 }
 
 $sid_list = Get-Item -Path "Registry::HKU\S-*" | Select-String -Pattern "S-\d-(?:\d+-){5,14}\d+" | ForEach-Object { $_.ToString().Trim() }
-
 foreach ($sid in $sid_list) {
     if ($sid -notlike "*_Classes*") {
         $regHKU = @(
@@ -50,9 +71,17 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item -Path $regPath -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    "Failed to remove CrystalPDF -> $regPath"
+                    Write-Host "Failed to remove CrystalPDF HKU key => $regPath"
+                    $tracker++
+                } else {
+                    Write-Host "Removed CrystalPDF HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
