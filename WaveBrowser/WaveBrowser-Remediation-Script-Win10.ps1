@@ -1,6 +1,6 @@
 $tracker = 0
 
-$procList = @("wavebrowser", "SWUpdater")
+$procList = @("wavebrowser", "SWUpdater", "SWUpdaterSetup")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
@@ -47,6 +47,20 @@ foreach ($username in $user_list) {
     }
 }
 
+$programPaths = @(
+    "C:\Program Files (x86)\Wavesor"
+)
+foreach ($programPath in $programPaths) {
+    if (Test-Path -Path $programPath) {
+        Remove-Item $programPath -Recurse -Force -ErrorAction SilentlyContinue
+        if (Test-Path -Path $programPath) {
+            Write-Host "Failed to remove Wave Browser system path => $programPath"
+        } else {
+            Write-Host "Removed Wave Browser system path => $programPath"
+        }
+    }
+}
+
 $tasks = Get-ScheduledTask -TaskName *Wave* | Select-Object -ExpandProperty TaskName
 foreach ($i in $tasks) {
     Unregister-ScheduledTask -TaskName $i -Confirm:$false -ErrorAction SilentlyContinue
@@ -65,6 +79,21 @@ foreach ($taskPath in $taskPaths) {
         } else {
             Write-Host "Removed Wave Browser task => $taskPath"
             $tracker++
+        }
+    }
+}
+
+$regHKLM = @(
+    "Registry::HKLM\SOFTWARE\Policies\Wavesor",
+    "Registry::HKLM\Software\WOW6432Node\Wavesor"
+)
+foreach ($reg in $regHKLM) {
+    if (Test-Path -Path $reg) {
+        Remove-Item $reg -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $reg) {
+            Write-Host "Failed to remove Wave Browser HKLM key => $reg"
+        } else {
+            Write-Host "Removed Wave Browser HKLM key => $reg"
         }
     }
 }
