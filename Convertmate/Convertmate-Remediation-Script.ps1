@@ -1,12 +1,22 @@
+$tracker = 0
+
 $procList = @("Convert Mate", "UpdateRetreiver")
 foreach ($proc in $procList) {
     $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
     if ($process) {
         $process | Stop-Process -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
+        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop ConvertMate process => $process"
+            $tracker++
+        } else {
+            Write-Host "Stopped ConvertMate process => $process"
+            $tracker++
+        }
     }
 }
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\Users\* | Select-Object -ExpandProperty Name
 foreach ($username in $user_list) {
@@ -19,7 +29,11 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $target) {
                 Remove-Item $target -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $target) {
-                    "Failed to remove ConvertMate => $target"
+                    Write-Host "Failed to remove ConvertMate user path => $target"
+                    $tracker++
+                } else {
+                    Write-Host "Removed ConvertMate user path => $target"
+                    $tracker++
                 }
             }
         }
@@ -39,7 +53,11 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            "Failed to remove ConvertMate task entry => $taskPath"
+            Write-Host "Failed to remove ConvertMate task => $taskPath"
+            $tracker++
+        } else {
+            Write-Host "Removed ConvertMate task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -54,7 +72,11 @@ foreach ($sid in $sid_list) {
             if (Test-Path $reg) {
                 Remove-Item $reg -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path $reg) {
-                    "Failed to remove ConvertMate user key => $reg"
+                    Write-Host "Failed to remove ConvertMate HKU key => $reg"
+                    $tracker++
+                } else {
+                    Wrrite-Host "Removed ConvertMate HKU key => $reg"
+                    $tracker++
                 }
             }
         }
@@ -70,7 +92,15 @@ foreach ($regPath in $regHKLM) {
     if (Test-Path $regPath) {
         Remove-Item $regPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path $regPath) {
-            "Failed to remove ConvertMate registry key => $regPath"
+            Write-Host "Failed to remove ConvertMate HKLM key => $regPath"
+            $tracker++
+        } else {
+            Write-Host "Removed ConvertMate HKLM key => $regPath"
+            $tracker++
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
