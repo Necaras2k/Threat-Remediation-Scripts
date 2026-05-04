@@ -55,8 +55,10 @@ foreach ($programPath in $programPaths) {
         Remove-Item $programPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $programPath) {
             Write-Host "Failed to remove Wave Browser system path => $programPath"
+            $tracker++
         } else {
             Write-Host "Removed Wave Browser system path => $programPath"
+            $tracker++
         }
     }
 }
@@ -92,8 +94,10 @@ foreach ($reg in $regHKLM) {
         Remove-Item $reg -Recurse -ErrorAction SilentlyContinue
         if (Test-Path -Path $reg) {
             Write-Host "Failed to remove Wave Browser HKLM key => $reg"
+            $tracker++
         } else {
             Write-Host "Removed Wave Browser HKLM key => $reg"
+            $tracker++
         }
     }
 }
