@@ -1,20 +1,22 @@
-$process = Get-Process upd -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
-}
+$tracker = 0
 
-$process = Get-Process PDFMaker -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
+$procList = @("upd", "PDFMaker", "PDFast")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop PDF Maker process => $process"
+            $tracker++
+        } else {
+            Write-Host "Stopped PDF Maker process => $process"
+            $tracker++
+        }
+    }
 }
-
-$process = Get-Process PDFast -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 2
-}
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\users\* | Select-Object Name -ExpandProperty Name
 foreach ($user in $user_list) {
@@ -25,16 +27,35 @@ foreach ($user in $user_list) {
             "C:\Users\$user\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PDFast.lnk",
             "C:\users\$user\Downloads\PDFMaker*.exe",
             "C:\users\$user\Downloads\PDFast*.exe",
-            "C:\Users\$user\appdata\roaming\PDFast",
-            "C:\WINDOWS\system32\config\systemprofile\AppData\Roaming\PDFast"
+            "C:\Users\$user\appdata\roaming\PDFast"
         )
         foreach ($path in $paths) {
             if (Test-Path -Path $path) {
                 Remove-Item -Path $path -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    Write-Host "Failed to remove PDF Maker -> $path"
+                    Write-Host "Failed to remove PDF Maker user path => $path"
+                    $tracker++
+                } else {
+                    Write-Host "Removed PDF Maker user path => $path"
+                    $tracker++
                 }
             }
+        }
+    }
+}
+
+$paths = @(
+    "C:\WINDOWS\system32\config\systemprofile\AppData\Roaming\PDFast"
+)
+foreach ($path in $paths) {
+    if (Test-Path -Path $path) {
+        Remove-Item -Path $path -Force -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $path) {
+            Write-Host "Failed to remove PDF Maker system path => $path"
+            $tracker++
+        } else {
+            Write-Host "Removed PDF Maker system path => $path"
+            $tracker++
         }
     }
 }
@@ -56,7 +77,11 @@ foreach ($sid in $sid_list) {
             if (Test-Path -Path $regPath) {
                 Remove-Item -Path $regPath -Recurse -Force -ErrorAction SilentlyContinue
                 if (Test-Path -Path $regPath) {
-                    Write-Host "Failed to remove PDF Maker -> $regPath"
+                    Write-Host "Failed to remove PDF Maker HKU key -> $regPath"
+                    $tracker++
+                } else {
+                    Write-Host "Removed PDF Maker HKU key => $regPath"
+                    $tracker++
                 }
             }
         }
@@ -67,13 +92,16 @@ $tasks = @(
     "PDFMaker_updater_*",
     "PDFast_updater_*"
 )
-
 foreach ($task in $tasks) {
     $taskPath = "C:\windows\system32\tasks\$task"
     if (Test-Path -Path $taskPath) {
         Remove-Item -Path $taskPath -Recurse -Force -ErrorAction SilentlyContinue
         if (Test-Path -Path $taskPath) {
-            Write-Host "Failed to remove PDF Maker task -> $taskPath"
+            Write-Host "Failed to remove PDF Maker task => $taskPath"
+            $tracker++
+        } else {
+            Write-Host "Removed PDF maker task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -87,14 +115,44 @@ $regKeys = @(
 foreach ($regKey in $regKeys) {
     if (Test-Path -Path $regKey) {
         Remove-Item -Path $regKey -Recurse -ErrorAction SilentlyContinue
+        if (Test-Path -Path $regKey) {
+            Write-Host "Failed to remove PDF Maker HKLM key => $regKey"
+            $tracker++
+        } else {
+            Write-Host "Removed PDF Maker HKLM key => $regKey"
+            $tracker++
+        }
     }
 }
 
-$service = Get-Service -Name '*PDF*' -ErrorAction SilentlyContinue
-if ($service) { $service | Stop-Service -Force -ErrorAction SilentlyContinue }
+$services = Get-Service -Name '*PDF*' -ErrorAction SilentlyContinue | Select-Object Name -ExpandProperty Name
+foreach ($service in $services) {
+    $svc = Get-Service -Name $service -ErrorAction SilentlyContinue
+    if ($svc) {
+        $svc | Stop-Service -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 15
+        if ($svc) {
+            Write-Host "Failed to stop PDF Maker service => $svc"
+            $tracker++
+        } else {
+            Write-Host "Stopped PDF Maker service => $svc"
+            $tracker++
+            if ($PSVersionTable.PSVersion.Major -ge 6) {
+                Remove-Service -Name $svc -Force -ErrorAction SilentlyContinue
+            } else {
+                Get-WmiObject -Class Win32_Service -Filter "Name='*PDF*'" | Remove-WmiObject
+            }
+            if ($svc) {
+                Write-Host "Failed to remove PDF Maker service => $svc"
+                $tracker++
+            } else {
+                Write-Host "Removed PDF Maker ervice => $svc"
+                $tracker++
+            }
+        }
+    }
+}
 
-if ($PSVersionTable.PSVersion.Major -eq 6 -and $PSVersionTable.PSVersion.Minor -eq 0) {
-    Remove-Service -Name $service -Force -ErrorAction SilentlyContinue
-} else {
-    Get-WmiObject -Class Win32_Service -Filter "Name='*PDF*'" | Remove-WmiObject
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
