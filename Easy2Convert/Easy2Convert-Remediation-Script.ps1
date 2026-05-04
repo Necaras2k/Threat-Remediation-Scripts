@@ -1,8 +1,22 @@
-$process = Get-Process "Easy2Convert" -ErrorAction SilentlyContinue
-if ($process) {
-    $process | Stop-Process -Force -ErrorAction SilentlyContinue    
+$tracker = 0
+
+$procList = @("Easy2Convert")
+foreach ($proc in $procList) {
+    $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+    if ($process) {
+        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 5
+        $process = Get-Process -Name $proc -ErrorAction SilentlyContinue
+        if ($process) {
+            Write-Host "Failed to stop Easy2Convert process => $process"
+            $tracker++
+        } else {
+            Write-Host "Stopped Easy2Convert process => $process"
+            $tracker++
+        }
+    }
 }
-Start-Sleep -Seconds 2
+Start-Sleep -Seconds 5
 
 $user_list = Get-Item C:\Users\* | Select-Object -ExpandProperty Name
 foreach ($username in $user_list) {
@@ -14,17 +28,24 @@ foreach ($username in $user_list) {
             if (Test-Path -Path $path) {
                 Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path -Path $path) {
-                    "Easy2Convert Removal Unsuccessful => $path"
+                    Write-Host "Failed to remove Easy2Convert user path => $path"
+                    $tracker++
+                } else {
+                    Write-Host "Removed Easy2Convert user path => $path"
+                    $tracker++
                 }
             }
         }
-
         $installers = @(Get-ChildItem "C:\Users\$username\Downloads" -Filter "Easy2Convert*.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
         foreach ($install in $installers) {
             if (Test-Path $install) {
                 Remove-Item $install -Force -ErrorAction SilentlyContinue
                 if (Test-Path $install) {
-                    "Easy2Convert Installer Removal Unsuccessful => $install"
+                    Write-Host "Failed to remove Easy2Convert installer => $install"
+                    $tracker++
+                } else {
+                    Write-Host "Removed Easy2Convert installer => $install"
+                    $tracker++
                 }
             }
         }
@@ -44,7 +65,11 @@ foreach ($taskPath in $taskPaths) {
     if (Test-Path -Path $taskPath) {
         Remove-Item $taskPath -Force -Recurse -ErrorAction SilentlyContinue
         if (Test-Path $taskPath) {
-            "Failed to remove Easy2Convert Task => $taskPath"
+            Write-Host "Failed to remove Easy2Convert task => $taskPath"
+            $tracker++
+        } esle {
+            Write-Host "Removed Easy2Convert task => $taskPath"
+            $tracker++
         }
     }
 }
@@ -59,9 +84,17 @@ foreach ($sid in $sid_list) {
             if (Test-Path $regPath) {
                 Remove-Item $regPath -Recurse -ErrorAction SilentlyContinue
                 if (Test-Path $regPath) {
-                    "Easy2Convert HKU Registry Removal Unsuccessful => $regPath"
+                    Write-Host "Failed to remove Easy2Convert HKU Registry => $regPath"
+                    $tracker++
+                } esle {
+                    Write-Host "Removed Easy2Convert HKU Registry => $regPath"
+                    $tracker++
                 }
             }
         }
     }
+}
+
+if ($tracker -eq 0) {
+    Write-Host "Nothing found to remediate"
 }
